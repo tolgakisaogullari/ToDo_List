@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>JAVA TODO LIST...</title>
+
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+	integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+	crossorigin="anonymous">
+
+<style type="text/css">
+label {
+	line-height: 50px !important;
+	display: block !important;
+	font-size: 15px !important;
+}
+
+.panel-title a {
+	display: block;
+}
+
+.header {
+	padding-top: 20px;
+	padding-bottom: 20px;
+}
+
+.backlog:hover {
+	background-color: rgba(119, 119, 119, 0.3);
+}
+
+.inprogress:hover {
+	background-color: rgba(51, 122, 183, 0.3);
+}
+
+.test:hover {
+	background-color: rgba(240, 173, 78, 0.3);
+}
+
+.done:hover {
+	background-color: rgba(92, 184, 92, 0.3);
+}
+</style>
+
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+
+<script
+	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+	integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+	crossorigin="anonymous"></script>
+
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"></script>
+
+</head>
+<body>
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-12 header">
+				<button type="button" class="btn btn-info btn-lg"
+					data-toggle="modal" data-target="#AddTask">Add New Task</button>
+
+				<!--Add Modal -->
+				<div id="AddTask" class="modal fade" role="dialog">
+					<div class="modal-dialog">
+
+						<!-- Modal content-->
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal">&times;</button>
+								<h4 class="modal-title">New Task</h4>
+							</div>
+							<div class="modal-body">
+								<div class="form-group">
+									<label for="usr">Title:</label> <input data-bind="value: Title"
+										type="text" class="form-control" id="usr">
+								</div>
+								<div class="form-group">
+									<label for="usr">Content:</label>
+									<textarea data-bind="value: Content" type="text"
+										class="form-control" id="usr"></textarea>
+								</div>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"
+									data-dismiss="modal">Close</button>
+								<button type="button" class="btn btn-primary"
+									data-bind="click: AddNewTask">Add</button>
+							</div>
+						</div>
+
+					</div>
+				</div>
+
+				<!-- Update Modal -->
+				<div id="UpdateTask" class="modal fade" role="dialog">
+					<div class="modal-dialog">
+
+						<!-- Modal content-->
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal">&times;</button>
+								<h4 class="modal-title">Update Task</h4>
+							</div>
+							<div class="modal-body">
+								<div class="form-group">
+									<label for="usr">Title:</label> <input data-bind="value: Title"
+										type="text" class="form-control" id="usr">
+								</div>
+								<div class="form-group">
+									<label for="usr">Content:</label>
+									<textarea data-bind="value: Content" type="text"
+										class="form-control" id="usr"></textarea>
+								</div>
+								<div class="form-group">
+									<label for="usr">Status:</label> <select class="form-control"
+										id="selectmenu1" name="" data-theme="c"
+										data-bind="options: StatusList, optionsValue: 'id', optionsText: 'name', optionsCaption: 'Select Status'">
+									</select>
+								</div>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default"
+									data-dismiss="modal">Close</button>
+								<button type="button" class="btn btn-primary"
+									data-bind="click: UpdateTask">Update</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-3">
+				<label class="label label-default">BackLog</label>
+				<div data-bind="foreach: List" class="panel-group" id="accordion">
+					<!--ko if:$data.statusId == 'BackLog' -->
+					<div class="panel panel-default">
+						<div class="panel-heading backlog">
+							<h4 class="panel-title">
+								<a data-toggle="collapse" data-parent="#accordion"
+									data-bind="attr: { href: '#'+$data.id}, text: $data.title"></a>
+								<br /> <span data-bind="click: $parent.Delete.bind($data)"
+									style="cursor: pointer" class="label label-danger">Delete</span>
+								<span data-bind="click: $parent.SetUpdateValue.bind($data)"
+									data-toggle="modal" data-target="#UpdateTask"
+									style="cursor: pointer" class="label label-primary">Update</span>
+							</h4>
+						</div>
+						<div data-bind="attr: { id: $data.id}"
+							class="panel-collapse collapse">
+							<div class="panel-body" data-bind="text: $data.content"></div>
+						</div>
+					</div>
+					<!--/ko-->
+				</div>
+			</div>
+			<div class="col-lg-3">
+				<label class="label label-primary">InProgress</label>
+				<div data-bind="foreach: List" class="panel-group" id="accordion">
+					<!--ko if:$data.statusId == 'InProgress' -->
+					<div class="panel panel-default">
+						<div class="panel-heading inprogress">
+							<h4 class="panel-title">
+								<a data-toggle="collapse" data-parent="#accordion"
+									data-bind="attr: { href: '#'+$data.id}, text: $data.title"></a>
+								<br /> <span
+									data-bind="click: $parent.SetUpdateValue.bind($data)"
+									data-toggle="modal" data-target="#UpdateTask"
+									style="cursor: pointer" class="label label-primary">Update</span>
+							</h4>
+						</div>
+						<div data-bind="attr: { id: $data.id}"
+							class="panel-collapse collapse">
+							<div class="panel-body" data-bind="text: $data.content"></div>
+						</div>
+					</div>
+					<!--/ko-->
+				</div>
+			</div>
+			<div class="col-lg-3">
+				<label class="label label-warning">Test</label>
+				<div data-bind="foreach: List" class="panel-group" id="accordion">
+					<!--ko if:$data.statusId == 'Test' -->
+					<div class="panel panel-default">
+						<div class="panel-heading test">
+							<h4 class="panel-title">
+								<a data-toggle="collapse" data-parent="#accordion"
+									data-bind="attr: { href: '#'+$data.id}, text: $data.title"></a>
+								<br /> <span
+									data-bind="click: $parent.SetUpdateValue.bind($data)"
+									data-toggle="modal" data-target="#UpdateTask"
+									style="cursor: pointer" class="label label-primary">Update</span>
+							</h4>
+						</div>
+						<div data-bind="attr: { id: $data.id}"
+							class="panel-collapse collapse">
+							<div class="panel-body" data-bind="text: $data.content"></div>
+						</div>
+					</div>
+					<!--/ko-->
+				</div>
+			</div>
+			<div class="col-lg-3">
+				<label class="label label-success">Done</label>
+				<div data-bind="foreach: List" class="panel-group" id="accordion">
+					<!--ko if:$data.statusId == 'Done' -->
+					<div class="panel panel-default">
+						<div class="panel-heading done">
+							<h4 class="panel-title">
+								<a data-toggle="collapse" data-parent="#accordion"
+									data-bind="attr: { href: '#'+$data.id}, text: $data.title"></a>
+								<br /> <span
+									data-bind="click: $parent.SetUpdateValue.bind($data)"
+									data-toggle="modal" data-target="#UpdateTask"
+									style="cursor: pointer" class="label label-primary">Update</span>
+
+							</h4>
+						</div>
+						<div data-bind="attr: { id: $data.id}"
+							class="panel-collapse collapse">
+							<div class="panel-body" data-bind="text: $data.content"></div>
+						</div>
+					</div>
+					<!--/ko-->
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script type="text/javascript">
+		function Master() {
+			var self = this;
+
+			self.Title = ko.observable();
+			self.Content = ko.observable();
+			self.TargetId = ko.observable();
+			self.List = ko.observableArray();
+			self.StatusList = [ {
+				name : 'BackLog',
+				id : 0,
+				disable : ko.observable(false)
+			}, {
+				name : 'InProgress',
+				id : 1,
+				disable : ko.observable(true)
+			}, {
+				name : 'Test',
+				id : 2,
+				disable : ko.observable(true)
+			}, {
+				name : 'Done',
+				id : 3,
+				disable : ko.observable(false)
+			} ];
+
+			self.NewContent = ko.observable();
+			self.NewTitle = ko.observable();
+			self.NewStatus = ko.observable();
+
+			self.AddNewTask = function() {
+				$.ajax({
+					url : "http://localhost:8085/ToDo_List/rest/task/createtask",
+					headers : {
+						'Content-Type' : 'application/x-www-form-urlencoded'
+					},
+					data : {
+						title : self.Title(),
+						content : self.Content(),
+						//You can set assignUserId dynamically. 
+						//This was set static value for sample
+						assignUserId : '1',
+						statusId : '0'
+					},
+					method : "POST",
+					success : function(response) {
+						$(".modal").modal("hide");
+						self.GetList();
+					}
+				});
+			};
+
+			self.Delete = function(data) {
+				$.ajax({
+					url : "http://localhost:8085/ToDo_List/rest/task/deletetask",
+					headers : {
+						'Content-Type' : 'application/x-www-form-urlencoded'
+					},
+					data : {
+						id : data.id
+					},
+					method : "POST",
+					success : function(response) {
+						self.GetList();
+					}
+				});
+			};
+
+			self.SetUpdateValue = function(data) {
+				self.Title(data.title);
+				self.Content(data.content);
+				self.TargetId(data.id);
+			};
+
+			self.UpdateTask = function() {
+				var statusId = $("#selectmenu1").val() == "" ? 0 : $("#selectmenu1").val();
+				
+				$.ajax({
+					url : "http://localhost:8085/ToDo_List/rest/task/updatetask",
+					headers : {
+						'Content-Type' : 'application/x-www-form-urlencoded'
+					},
+					data : {
+						title : self.Title(),
+						content : self.Content(),
+						//You can set assignUserId dynamically. 
+						//This was set static value for sample
+						assignUserId : '1',
+						statusId : statusId,
+						id : self.TargetId()
+					},
+					method : "POST",
+					success : function(response) {
+						$(".modal").modal("hide");
+						self.GetList();
+					}
+				});
+			};
+
+			self.GetList = function() {
+				$.ajax({
+					url : "http://localhost:8085/ToDo_List/rest/task/gettasklist",
+					method : "GET",
+					success : function(response) {
+						self.List(jQuery.parseJSON(response));
+					}
+				});
+			}
+		}
+
+		var master = new Master();
+
+		ko.applyBindings(master);
+
+		master.GetList();
+	</script>
+</body>
+</html>
