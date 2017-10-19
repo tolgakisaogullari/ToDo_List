@@ -1,4 +1,4 @@
-# ToDo_List
+# Knockout ToDo List with Bootstrap
 Simple todo list app that was made with java rest api and knockout.js
 
 Which libs used:
